@@ -7,7 +7,7 @@ BOT_KEY = "6059146214:AAH0t4S8tLcDL81HrUFnU4GIiwhbO8GraXU"
 types = telebot.types
 bot = telebot.TeleBot(BOT_KEY)
 MY_CHAT_ID = 156956400
-spchars = ['\\', '/', ':', '*', "?", "'", "<", ">", "|", " "]
+spchars = ['\\', '/', ':', '*', "?", "'", "<", ">", "|"]
 
 # def generate_response(message):
 #     openai.api_key = API_KEY
@@ -83,7 +83,7 @@ def getres(message, reply):
             fanswear += t
     print(f"answer   {fanswear}")
     add(message, fanswear)
-    bot.send_message(message.chat.id, fanswear)
+    bot.send_message(message.chat.id, answer)
 
 
 bot.set_update_listener(handle) #register listener
