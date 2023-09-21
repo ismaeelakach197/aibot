@@ -1,4 +1,3 @@
-import openai
 import telebot
 import sqlite3
 import requests
@@ -8,7 +7,7 @@ BOT_KEY = "6059146214:AAH0t4S8tLcDL81HrUFnU4GIiwhbO8GraXU"
 types = telebot.types
 bot = telebot.TeleBot(BOT_KEY)
 MY_CHAT_ID = 156956400
-
+spchars = ['\\', '/', ':', '*', "?", "'", "<", ">", "|", " "]
 
 # def generate_response(message):
 #     openai.api_key = API_KEY
@@ -44,20 +43,20 @@ def handle(message):
 @bot.message_handler(commands=['ask'])
 def ask(message):
 
-    print("ask")
+    print(message.text)
     send_req = bot.send_message(message.chat.id, "Send Your Question")
     bot.register_next_step_handler(send_req, get_question)
 
 def get_question(message):
-    print(message.text)
-    print(message.chat)
     if message.chat.id != MY_CHAT_ID:
         bot.send_message(MY_CHAT_ID, str(f"{message.text}{message.chat}"))
-    bot.reply_to(message, getres(message))
+    reply = bot.reply_to(message, "Generating Response...")
+    getres(message, reply)
 
 
 url = "https://robomatic-ai.p.rapidapi.com/api"
-def getres(message):
+def getres(message, reply):
+    print(message.text)
     payload = {
         "in": message.text,
         "op": "in",
@@ -75,8 +74,17 @@ def getres(message):
     }
 
     response = requests.post(url, data=payload, headers=headers)
+    bot.delete_message(reply.chat.id, reply.id)
+    json = response.json()
+    answer = json['out']
+    fanswear = ''
+    for t in answer:
+        if t not in spchars:
+            fanswear += t
+    print(f"answer   {fanswear}")
+    add(message, fanswear)
+    bot.send_message(message.chat.id, fanswear)
 
-    print(response.json())
 
 bot.set_update_listener(handle) #register listener
 bot.polling(True)
